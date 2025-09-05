@@ -1,5 +1,6 @@
 package utilities;
 
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import com.microsoft.playwright.*;
@@ -49,23 +50,41 @@ public class BrowserKeeper {
 	
 	 public void initiateHeadlessBrowser(String browserName) {
 		 playwright = Playwright.create();
+		 BrowserContext context = null;
 		 if(browserName.equalsIgnoreCase("chrome")) {
 			 // ensures browser works in headless state
 			 browser = playwright.chromium().launch(new BrowserType.LaunchOptions()
-					 .setHeadless(true));
+					    .setHeadless(true)
+					    .setArgs(java.util.Arrays.asList(
+					        "--headless=new",
+					        "--disable-blink-features=AutomationControlled",
+					        "--disable-gpu",
+					        "--no-sandbox",
+					        "--disable-dev-shm-usage"
+					    ))
+					);
 		 }else if(browserName.equalsIgnoreCase("edge")) {
 			 browser = playwright.chromium().launch(new BrowserType.LaunchOptions()
 					 .setChannel("msedge")
-					 .setHeadless(true));
+					 .setHeadless(true)
+					 .setArgs(java.util.Arrays.asList(
+							 "--headless=new",
+							 "--no-sandbox", 
+							 "--headless", 
+							 "--disable-gpu")));
 		 }
 		  else if(browserName.equalsIgnoreCase("firefox")) {
 			 browser = playwright.firefox().launch(new BrowserType.LaunchOptions()
 			          .setHeadless(true));
 			 }
 		
-		 
+		 context = browser.newContext(new Browser.NewContextOptions()
+			      .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36")
+		       //   .setViewportSize(1280, 720));     
+			      .setViewportSize(null));
 		// Adds the tab on the browser 
-		 page = browser.newPage();
+		 page = context.newPage();
+		 this.movePageToTackleLazyLoad();
 	 }
 	 
 	 public void openUrl(String url) {
@@ -116,8 +135,12 @@ public class BrowserKeeper {
 	 }
 	 
 	 public void waitForPageToRender() {
-		
-		 page.waitForLoadState(LoadState.NETWORKIDLE); 
+		try {
+		 page.waitForLoadState(LoadState.NETWORKIDLE, new Page.WaitForLoadStateOptions().setTimeout(10000)); 
+		}
+		catch(Exception ex) {
+			// must never fail this step due to exception
+		}
 		
 	 }
 	 
@@ -144,6 +167,13 @@ public class BrowserKeeper {
 	 }
 	 
 	 public void closeBrowserSession() {
+		 if(browser!= null && browser.isConnected()) {
+		 browser.close();
+		 }
+		 playwright.close();
+	 }
+	 
+	 public void closeBrowser() {
 		 browser.close();
 	 }
 	

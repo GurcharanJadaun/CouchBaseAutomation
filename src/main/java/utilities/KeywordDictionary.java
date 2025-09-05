@@ -144,6 +144,9 @@ public class KeywordDictionary  {
 	public void closeBrowser() {
 		browser.closeBrowserSession();
 	}
+	public void closeSession() {
+		browser.closeBrowserSession();
+	}
 	
 		
 }
