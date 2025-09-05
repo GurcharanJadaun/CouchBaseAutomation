@@ -41,11 +41,13 @@ public enum TestStatus {
 		return this == STOP_EXECUTION || this == INVALID;
 	}
 	public TestStatus setStatusTo() {
-		// TODO Auto-generated method stub
-		return null;
+		return this;
 	}
 	public boolean isFailed() {
 		return this.shouldStop() || this == FAILED;
+	}
+	public boolean isPassed() {
+		return this == PASSED;
 	}
 }
 

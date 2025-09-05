@@ -1,10 +1,6 @@
 package loader;
 
-import java.util.List;
-
 import dataExtractor.XlsxDataExtractor;
-import testManager.TestCase;
-import testManager.TestSuite;
 
 public class TestSuiteLoader extends XlsxDataExtractor {
 	
@@ -15,7 +11,6 @@ public class TestSuiteLoader extends XlsxDataExtractor {
 		this.keywordDir = "CompilerDictionary\\KeywordDictionary";
 	}
 	
-	List <TestCase> beforeAllMethods, beforeEachMethod;
 	
 	public void setupTest() {
 		this.loadLocatorMap(locatorDir);
