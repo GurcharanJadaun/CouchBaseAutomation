@@ -169,12 +169,12 @@ public class RunTests extends TestSuiteLoader implements RunTestSuite {
 			// Log error in logs here with step details like action, locator and testData
 			testStep.setResult(TestStatus.INVALID, "Something missed by compiler\n<<-Didn't find a proper match->>\n");
 		}
-		// System.out.println("Executing : " + action + "\t" + locator + "\t" + testData
-		// + "\t" + ex.result + "\n" + ex.reason);
+//		 System.out.println("Executing : " + action + "\t" + locator + "\t" + testData
+//		 + "\t" + ex.result + "\n" + ex.reason);
 
 		if (ex.result == TestStatus.PASSED) {
 			testStep.setResult(TestStatus.PASSED);
-			stepNode.pass("Step : " + ex.reason);
+			stepNode.pass( ex.reason);
 		} else {
 			testStep.setResult(ex.result, ex.reason);
 			stepNode.fail("Step : " + ex.reason);
