@@ -1,5 +1,7 @@
 package utilities;
 
+import java.text.Normalizer;
+
 import TestExceptions.SoftAssert;
 import testManager.TestStatus;
 
@@ -31,6 +33,7 @@ public class KeywordDictionary  {
 	public void triggerLazyLoadAndClick(String locatorData) throws InterruptedException {
 		browser.movePageToTackleLazyLoad();
 		browser.waitForPresenceOfElement(locatorData);
+		browser.checkVisibilityOfElement(locatorData);
 		Thread.sleep(250);
 		browser.clickWebElement(locatorData);
 	}
@@ -93,7 +96,10 @@ public class KeywordDictionary  {
 		browser.waitForPresenceOfElement(locatorData);
 		browser.scrollIntoView(locatorData);
 		String actualData = browser.getTextFromTextBox(locatorData);
-		if(!actualData.equals(expectedData)) {
+		if(expectedData.equalsIgnoreCase("null")) {
+			expectedData = "";
+		}
+		if(!actualData.equals(expectedData.trim())) {
 			throw new Exception("<< Expected and Actual Data don't match >>"+
 			"\nActual Data : "+ actualData +
 			"\nExpected Data : " + expectedData);
@@ -104,6 +110,9 @@ public class KeywordDictionary  {
 		browser.waitForPresenceOfElement(locatorData);
 		browser.scrollIntoView(locatorData);
 		String actualData = browser.getTextFromTextBox(locatorData);
+		if(expectedData.equalsIgnoreCase("null")) {
+			expectedData = "";
+		}
 		if(!actualData.equals(expectedData)) {
 			throw new SoftAssert("<< Expected and Actual Data don't match >>"+
 			"\nActual Data : "+ actualData +
@@ -115,10 +124,24 @@ public class KeywordDictionary  {
 		browser.waitForPresenceOfElement(locatorData);
 		browser.scrollIntoView(locatorData);
 		String actualData = browser.getTextFromElement(locatorData);
-		if(!actualData.equals(expectedData)) {
+		if(!this.normaliseString(actualData).equals(this.normaliseString(expectedData))) {
 			throw new Exception("<< Expected and Actual Data don't match >>"+
-								"\nActual Data : "+ actualData +
+								"\nActual Data   : "+ actualData +
 								"\nExpected Data : " + expectedData);
+		}
+	}
+	
+	public void isButtonEnabled(String locator) throws Exception {
+		boolean result = browser.isButtonEnabled(locator);
+		if(!result) {
+			throw new Exception("<< Button is not enabled >>");
+		}
+	}
+	
+	public void isButtonDisabled(String locator) throws Exception {
+		boolean result = browser.isButtonDisabled(locator);
+		if(!result) {
+			throw new Exception("<< Button is not disabled >>");
 		}
 	}
 	
@@ -126,10 +149,17 @@ public class KeywordDictionary  {
 		browser.waitForPresenceOfElement(locatorData);
 		browser.scrollIntoView(locatorData);
 		String actualData = browser.getTextFromElement(locatorData);
-		if(!actualData.equals(expectedData)) {
+		if(!this.normaliseString(actualData).equals(this.normaliseString(expectedData))) {
 			throw new SoftAssert("<< Expected and Actual Data don't match >>"+
-								"\nActual Data : "+ actualData +
+								"\nActual Data   : "+ actualData +
 								"\nExpected Data : " + expectedData);
+		}
+	}
+	
+	public void elementShouldNotBePresent(String locator) throws SoftAssert {
+		boolean result = browser.isElementAbsentInDom(locator);
+		if(!result) {
+			throw new SoftAssert("<< Element is Present in DOM >>");
 		}
 	}
 	
@@ -148,5 +178,16 @@ public class KeywordDictionary  {
 		browser.closeBrowserSession();
 	}
 	
-		
+// String manipulations
+	
+	 String normaliseString(String text) {
+		 try{
+				text = Normalizer.normalize(text, Normalizer.Form.NFC)
+	             .replaceAll("[^\\p{ASCII}]", " ");
+				 text = text.trim();
+			 }catch(Exception ex) {
+				 text = "";
+			 }
+		 return text;
+	}
 }
